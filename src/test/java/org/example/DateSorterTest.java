@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DateSorterTest {
     private static DateSorter dateSorter;
@@ -54,32 +55,33 @@ public class DateSorterTest {
     }
 
     @Test
-    public void DateSortedExampleTest() {
+    public void testSortDates_ExampleData_Ok() {
         List<LocalDate> actual = (List<LocalDate>) dateSorter.sortDates(exampleListToSort);
 
-        if (actual.size() != exampleSortedList.size()) {
-            fail("Size of actual list is different from the expected list!");
-        }
-
-        for (int i = 0; i < exampleSortedList.size(); i++) {
-            if (!actual.get(i).equals(exampleSortedList.get(i))) {
-                fail("Mismatch at index " + i + ": Expected " + sortedList.get(i) + ", but got " + actual.get(i));
-            }
-        }
+        assertEquals(exampleSortedList, actual);
     }
 
     @Test
-    public void DateSorterComplexTest() {
+    public void testSortDates_ComplexTest_Ok() {
         List<LocalDate> actual = (List<LocalDate>) dateSorter.sortDates(listToSort);
 
-        if (actual.size() != sortedList.size()) {
-            fail("Size of actual list is different from the expected list!");
-        }
+        assertEquals(sortedList, actual);
+    }
 
-        for (int i = 0; i < sortedList.size(); i++) {
-            if (!actual.get(i).equals(sortedList.get(i))) {
-                fail("Mismatch at index " + i + ": Expected " + sortedList.get(i) + ", but got " + actual.get(i));
-            }
-        }
+    @Test
+    public void testSortDates_NullInput_NotOk() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            dateSorter.sortDates(null);
+        });
+    }
+
+    @Test
+    public void testSortDates_SomeDatesAreNull_NotOk() {
+        List<LocalDate> dates = new ArrayList<>();
+        dates.add(LocalDate.of(2005, 7, 1));
+        dates.add(null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            dateSorter.sortDates(dates);
+        });
     }
 }

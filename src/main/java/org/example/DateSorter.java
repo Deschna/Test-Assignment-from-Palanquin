@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -31,6 +32,7 @@ public class DateSorter {
      * @param unsortedDates - an unsorted list of dates
      * @return the collection of dates now sorted as per the spec
      */
+    private Comparator<LocalDate> comparator;
     private final String sortString;
 
     public DateSorter(String sortString) {
@@ -38,37 +40,41 @@ public class DateSorter {
     }
 
     public Collection<LocalDate> sortDates(List<LocalDate> unsortedDates) {
-        List<LocalDate> dates = new ArrayList<>(unsortedDates);
-        int datesSize = dates.size();
-
-        LocalDate temp;
-        for (int i = 0; i < datesSize; i++) {
-            for (int j = 1; j < datesSize - i; j++) {
-                if (compareDate(dates.get(j - 1), dates.get(j)) > 0) {
-                    temp = dates.get(j - 1);
-                    dates.set(j - 1, dates.get(j));
-                    dates.set(j, temp);
-                }
-            }
+        if(unsortedDates == null) {
+            throw new IllegalArgumentException("Input data is null!");
         }
+
+        List<LocalDate> dates = new ArrayList<>(unsortedDates);
+
+        comparator = getComparator();
+        dates.sort(comparator);
+
         return dates;
     }
 
-    private int compareDate(LocalDate firstDate, LocalDate secondDate) {
-        if (firstDate == null || secondDate == null) {
-            throw new IllegalArgumentException("One of the dates is a null!");
+    private Comparator<LocalDate> getComparator() {
+        if (comparator != null) {
+            return comparator;
         }
+        return new Comparator<LocalDate>() {
+            @Override
+            public int compare(LocalDate firstDate, LocalDate secondDate) {
+                if (firstDate == null || secondDate == null) {
+                    throw new IllegalArgumentException("One of the dates is a null!");
+                }
 
-        boolean isFirstMonthContainsString = isMonthContainsStringToSort(firstDate.getMonth());
-        boolean isSecondMonthContainsString = isMonthContainsStringToSort(secondDate.getMonth());
+                boolean isFirstMonthContainsString = isMonthContainsStringToSort(firstDate.getMonth());
+                boolean isSecondMonthContainsString = isMonthContainsStringToSort(secondDate.getMonth());
 
-        if (isFirstMonthContainsString && isSecondMonthContainsString) {
-            return firstDate.compareTo(secondDate);
-        } else if (!isFirstMonthContainsString && !isSecondMonthContainsString) {
-            return firstDate.compareTo(secondDate) * -1;
-        } else {
-            return isFirstMonthContainsString ? -1 : 1;
-        }
+                if (isFirstMonthContainsString && isSecondMonthContainsString) {
+                    return firstDate.compareTo(secondDate);
+                } else if (!isFirstMonthContainsString && !isSecondMonthContainsString) {
+                    return firstDate.compareTo(secondDate) * -1;
+                } else {
+                    return isFirstMonthContainsString ? -1 : 1;
+                }
+            }
+        };
     }
 
     private boolean isMonthContainsStringToSort(Month month) {
