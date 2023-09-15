@@ -3,20 +3,34 @@ package org.example;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import org.junit.Test;
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class DateSorterTest {
-    private final DateSorter dateSorter;
-    private final List<LocalDate> listToSort;
-    private final List<LocalDate> sortedList;
+    private static DateSorter dateSorter;
+    private static List<LocalDate> exampleListToSort;
+    private static List<LocalDate> exampleSortedList;
+    private static List<LocalDate> listToSort;
+    private static List<LocalDate> sortedList;
     private static final String SORT_STRING = "r";
 
-    public DateSorterTest() {
-        Comparator<LocalDate> comparator = new CustomDateMonthComparator(SORT_STRING);
-        dateSorter = new DateSorter(comparator);
+    @BeforeAll
+    public static void setUp() {
+        dateSorter = new DateSorter(SORT_STRING);
+
+        exampleListToSort = new ArrayList<>();
+        exampleListToSort.add(LocalDate.of(2005, 7, 1));
+        exampleListToSort.add(LocalDate.of(2005, 1, 2));
+        exampleListToSort.add(LocalDate.of(2005, 1, 1));
+        exampleListToSort.add(LocalDate.of(2005, 5, 3));
+
+        exampleSortedList = new ArrayList<>();
+        exampleSortedList.add(LocalDate.of(2005, 1, 1));
+        exampleSortedList.add(LocalDate.of(2005, 1, 2));
+        exampleSortedList.add(LocalDate.of(2005, 7, 1));
+        exampleSortedList.add(LocalDate.of(2005, 5, 3));
 
         listToSort = new ArrayList<>();
         listToSort.add(LocalDate.of(2023, Month.JANUARY, 25));
@@ -28,7 +42,6 @@ public class DateSorterTest {
         listToSort.add(LocalDate.of(2023, Month.AUGUST, 20));
         listToSort.add(LocalDate.of(2024, Month.MAY, 10));
 
-
         sortedList = new ArrayList<>();
         sortedList.add(LocalDate.of(2023, Month.JANUARY, 25));
         sortedList.add(LocalDate.of(2023, Month.APRIL, 10));
@@ -38,6 +51,21 @@ public class DateSorterTest {
         sortedList.add(LocalDate.of(2024, Month.MAY, 10));
         sortedList.add(LocalDate.of(2023, Month.AUGUST, 20));
         sortedList.add(LocalDate.of(2023, Month.MAY, 10));
+    }
+
+    @Test
+    public void DateSortedExampleTest() {
+        List<LocalDate> actual = (List<LocalDate>) dateSorter.sortDates(exampleListToSort);
+
+        if (actual.size() != exampleSortedList.size()) {
+            fail("Size of actual list is different from the expected list!");
+        }
+
+        for (int i = 0; i < exampleSortedList.size(); i++) {
+            if (!actual.get(i).equals(exampleSortedList.get(i))) {
+                fail("Mismatch at index " + i + ": Expected " + sortedList.get(i) + ", but got " + actual.get(i));
+            }
+        }
     }
 
     @Test
